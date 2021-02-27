@@ -1,0 +1,10 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.OnlineSubsystemFlex.cpp.obj": [
+			"OnlineSessionInterfaceFlex.cpp.obj",
+			"OnlineSubsystemFlex.cpp.obj",
+			"OnlineSubsystemFlexModule.cpp.obj"
+		]
+	}
+}
