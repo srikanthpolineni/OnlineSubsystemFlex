@@ -13,8 +13,7 @@ public class OnlineSubsystemFlex : ModuleRules
         PublicDependencyModuleNames.AddRange(
             new string[]
             {
-                "OnlineSubsystemUtils",
-                "OnlineSubsystemFlexLibrary"
+                "OnlineSubsystemUtils"
             }
             );
 
@@ -32,7 +31,9 @@ public class OnlineSubsystemFlex : ModuleRules
                 "OnlineSubsystem",
                 "Json",
                 "PacketHandler",
-                "Projects"
+                "Projects",
+                "Sockets",
+                "Networking"
             }
             );
 
