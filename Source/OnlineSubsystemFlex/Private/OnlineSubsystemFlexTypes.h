@@ -131,7 +131,7 @@ PACKAGE_SCOPE:
 
 	FOnlineSessionInfoFlex(EFlexSession::Type SessionType, const FUniqueNetIdFlex& InSessionId);
 
-	void Init();
+	void Init(const FOnlineSubsystemFlex& Subsystem);
 
 	void InitLAN();
 

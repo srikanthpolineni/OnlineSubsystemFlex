@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "OnlineDelegateMacros.h"
 #include "OnlineSubsystemImpl.h"
+#include "OnlineAsyncTaskManagerFlex.h"
 
 #ifndef FLEX_SUBSYSTEM
 #define FLEX_SUBSYSTEM FName(TEXT("FLEX"))
@@ -106,6 +107,8 @@ public:
 
 
 	virtual bool Tick(float DeltaTime) override;
+
+	void QueueAsyncTask(FOnlineAsyncTask* AsyncTask);
 };
 
 typedef TSharedPtr<FOnlineSubsystemFlex, ESPMode::ThreadSafe> FOnlineSubsystemFlexPtr;

@@ -1,5 +1,7 @@
 #include "OnlineSessionInterfaceFlex.h"
 #include "SocketSubsystem.h"
+#include "OnlineSubsystemFlex.h"
+#include "OnlineSubsystemUtils.h"
 
 void FOnlineSessionFlex::TickLanTasks(float DeltaTime)
 {
@@ -175,7 +177,7 @@ void FOnlineSessionInfoFlex::Init(const FOnlineSubsystemFlex& Subsystem)
 
 	FGuid OwnerGuid;
 	FPlatformMisc::CreateGuid(OwnerGuid);
-	SessionId = FUniqueNetIdNull(OwnerGuid.ToString());
+	SessionId = FUniqueNetIdFlex(OwnerGuid.ToString());
 }
 
 void FOnlineSessionInfoFlex::InitLAN()
@@ -201,12 +203,12 @@ bool FOnlineSessionFlex::CreateSession(int32 HostingPlayerNum, FName SessionName
 
 		Session->HostingPlayerNum = HostingPlayerNum;
 
-		check(NullSubsystem);
+		check(FlexSubsystem);
 
 		// if did not get a valid one, use just something
 		if (!Session->OwningUserId.IsValid())
 		{
-			Session->OwningUserId = MakeShareable(new FUniqueNetIdFLEX(FString::Printf(TEXT("%d"), HostingPlayerNum)));
+			Session->OwningUserId = MakeShareable(new FUniqueNetIdFlex(FString::Printf(TEXT("%d"), HostingPlayerNum)));
 			Session->OwningUserName = FString(TEXT("FlexUser"));
 		}
 
@@ -215,7 +217,7 @@ bool FOnlineSessionFlex::CreateSession(int32 HostingPlayerNum, FName SessionName
 
 		// Setup the host session info
 		FOnlineSessionInfoFlex* NewSessionInfo = new FOnlineSessionInfoFlex();
-		NewSessionInfo->Init(*NullSubsystem);
+		NewSessionInfo->Init(*FlexSubsystem);
 		Session->SessionInfo = MakeShareable(NewSessionInfo);
 
 		Result = UpdateMasterServer(Session);
@@ -252,7 +254,7 @@ bool FOnlineSessionFlex::CreateSession(int32 HostingPlayerNum, FName SessionName
 uint32 FOnlineSessionFlex::UpdateMasterServer(FNamedOnlineSession* Session) 
 {
 
-
+	return 1;
 
 
 }

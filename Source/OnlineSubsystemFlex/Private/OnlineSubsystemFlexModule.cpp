@@ -6,7 +6,6 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemFlex.h"
 #include "Interfaces/IPluginManager.h"
-#include "OnlineSubsystemFlexLibrary/OnlineSubsystemFlexLibrary.h"
 
 IMPLEMENT_MODULE(FOnlineSubsystemFlexModule, OnlineSubsystemFlex)
 
@@ -71,9 +70,5 @@ void FOnlineSubsystemFlexModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
-
-	// Free the dll handle
-	FPlatformProcess::FreeDllHandle(OnlineSubsystemFlexLibraryHandle);
-	OnlineSubsystemFlexLibraryHandle = nullptr;
 }
 
