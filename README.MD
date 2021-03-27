@@ -6,8 +6,9 @@ Don't use.. Initial Commit, LONG WAY TO GO.
 ### Features
 
 
-- Online subsystem for managing dedicated game server deployment for cloud
-- TBA
+- Online subsystem for managing game session, friends, achievements, chat and user access management. 
+- Separate nodejs applications for Master server and user access management.
+- TBD
 
 
 
