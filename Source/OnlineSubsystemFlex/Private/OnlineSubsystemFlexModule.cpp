@@ -61,34 +61,10 @@ FOnlineSubsystemFlexPtr FOnlineFactoryFlex::FlexSingleton = nullptr;
 
 void FOnlineSubsystemFlexModule::StartupModule()
 {
-	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 
-	// Get the base directory of this plugin
-	FString BaseDir = IPluginManager::Get().FindPlugin("OnlineSubsystemFlex")->GetBaseDir();
-
-	// Add on the relative location of the third party dll and load it
-	FString LibraryPath;
-#if PLATFORM_WINDOWS
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/OnlineSubsystemFlexLibrary/Win64/OnlineSubsystemFlexLibrary.dll"));
-#elif PLATFORM_MAC
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/OnlineSubsystemFlexLibrary/Mac/Release/libOnlineSubsystemFlexLibrary.dylib"));
-#endif // PLATFORM_WINDOWS
-
-	OnlineSubsystemFlexLibraryHandle = !LibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*LibraryPath) : nullptr;
-
-	if (OnlineSubsystemFlexLibraryHandle)
-	{
-		// Call the test function in the third party library that opens a message box
-		OnlineSubsystemFlexLibraryFunction();
-
-		FlexFactory = new FOnlineFactoryFlex();
-		FOnlineSubsystemModule& OSS = FModuleManager::GetModuleChecked<FOnlineSubsystemModule>("OnlineSubsystem");
-		OSS.RegisterPlatformService(FLEX_SUBSYSTEM, FlexFactory);
-	}
-	else
-	{
-		//FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("ThirdPartyLibraryError", "Failed to load example third party library"));
-	}
+	FlexFactory = new FOnlineFactoryFlex();
+	FOnlineSubsystemModule& OSS = FModuleManager::GetModuleChecked<FOnlineSubsystemModule>("OnlineSubsystem");
+	OSS.RegisterPlatformService(FLEX_SUBSYSTEM, FlexFactory);
 }
 
 void FOnlineSubsystemFlexModule::ShutdownModule()

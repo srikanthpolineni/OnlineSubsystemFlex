@@ -134,16 +134,16 @@ TSharedPtr<const FUniqueNetId> FOnlineSessionFlex::CreateSessionIdFromString(con
 #pragma region FOnlineSessionInfoFlex
 
 
-FOnlineSessionInfoFlex::FOnlineSessionInfoFlex(EFlexSession::Type InSessionType):
-SessionType(InSessionType),
-HostAddr(nullptr),
-FlexP2PAddr(nullptr),
-SessionId((uint64)0),
-ConnectionMethod((InSessionType == EFlexSession::LANSession) ? FFlexConnectionMethod::Direct : FFlexConnectionMethod::None)
+FOnlineSessionInfoFlex::FOnlineSessionInfoFlex(EFlexSession::Type InSessionType) :
+	SessionType(InSessionType),
+	HostAddr(nullptr),
+	FlexP2PAddr(nullptr),
+	SessionId((uint64)0),
+	ConnectionMethod((InSessionType == EFlexSession::LANSession) ? FFlexConnectionMethod::Direct : FFlexConnectionMethod::None)
 {
 }
 
-FOnlineSessionInfoFlex::FOnlineSessionInfoFlex(EFlexSession::Type InSessionType, const FUniqueNetIdFlex& InSessionId):
+FOnlineSessionInfoFlex::FOnlineSessionInfoFlex(EFlexSession::Type InSessionType, const FUniqueNetIdFlex& InSessionId) :
 	SessionType(InSessionType),
 	HostAddr(nullptr),
 	FlexP2PAddr(nullptr),
@@ -152,37 +152,114 @@ FOnlineSessionInfoFlex::FOnlineSessionInfoFlex(EFlexSession::Type InSessionType,
 {
 }
 
-void FOnlineSessionInfoFlex::Init()
+void FOnlineSessionInfoFlex::Init(const FOnlineSubsystemFlex& Subsystem)
 {
+	// Read the IP from the system
+	bool bCanBindAll;
+	HostAddr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalHostAddr(*GLog, bCanBindAll);
+
+	// The below is a workaround for systems that set hostname to a distinct address from 127.0.0.1 on a loopback interface.
+	// See e.g. https://www.debian.org/doc/manuals/debian-reference/ch05.en.html#_the_hostname_resolution
+	// and http://serverfault.com/questions/363095/why-does-my-hostname-appear-with-the-address-127-0-1-1-rather-than-127-0-0-1-in
+	// Since we bind to 0.0.0.0, we won't answer on 127.0.1.1, so we need to advertise ourselves as 127.0.0.1 for any other loopback address we may have.
+	uint32 HostIp = 0;
+	HostAddr->GetIp(HostIp); // will return in host order
+	// if this address is on loopback interface, advertise it as 127.0.0.1
+	if ((HostIp & 0xff000000) == 0x7f000000)
+	{
+		HostAddr->SetIp(0x7f000001);	// 127.0.0.1
+	}
+
+	// Now set the port that was configured
+	HostAddr->SetPort(GetPortFromNetDriver(Subsystem.GetInstanceName()));
+
+	FGuid OwnerGuid;
+	FPlatformMisc::CreateGuid(OwnerGuid);
+	SessionId = FUniqueNetIdNull(OwnerGuid.ToString());
 }
 
 void FOnlineSessionInfoFlex::InitLAN()
 {
-	SessionType = EFlexSession::LANSession;
-	ConnectionMethod = FFlexConnectionMethod::Direct;
-
-	uint64 Nonce = 0;
-	GenerateNonce((uint8*)&Nonce, 8);
-	SessionId = FUniqueNetIdFlex(Nonce);
-
-	bool bCanBindAll;
-	HostAddr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalHostAddr(*GLog, bCanBindAll);
-	HostAddr->SetPort(FURL::UrlConfig.DefaultPort);
-
-	Init();
-
 }
 
 #pragma endregion FOnlineSessionInfoFlex
 
 bool FOnlineSessionFlex::CreateSession(int32 HostingPlayerNum, FName SessionName, const FOnlineSessionSettings& NewSessionSettings)
 {
-	return false;
+	uint32 Result = ONLINE_FAIL;
+
+	FNamedOnlineSession* Session = GetNamedSession(SessionName);
+
+	if (Session == NULL)
+	{
+		// Create a new session and deep copy the game settings
+		Session = AddNamedSession(SessionName, NewSessionSettings);
+		check(Session);
+		Session->SessionState = EOnlineSessionState::Creating;
+		Session->NumOpenPrivateConnections = NewSessionSettings.NumPrivateConnections;
+		Session->NumOpenPublicConnections = NewSessionSettings.NumPublicConnections;	// always start with full public connections, local player will register later
+
+		Session->HostingPlayerNum = HostingPlayerNum;
+
+		check(NullSubsystem);
+
+		// if did not get a valid one, use just something
+		if (!Session->OwningUserId.IsValid())
+		{
+			Session->OwningUserId = MakeShareable(new FUniqueNetIdFLEX(FString::Printf(TEXT("%d"), HostingPlayerNum)));
+			Session->OwningUserName = FString(TEXT("FlexUser"));
+		}
+
+		// Unique identifier of this build for compatibility
+		Session->SessionSettings.BuildUniqueId = GetBuildUniqueId();
+
+		// Setup the host session info
+		FOnlineSessionInfoFlex* NewSessionInfo = new FOnlineSessionInfoFlex();
+		NewSessionInfo->Init(*NullSubsystem);
+		Session->SessionInfo = MakeShareable(NewSessionInfo);
+
+		Result = UpdateMasterServer(Session);
+
+		if (Result != ONLINE_IO_PENDING)
+		{
+			// Set the game state as pending (not started)
+			Session->SessionState = EOnlineSessionState::Pending;
+
+			if (Result != ONLINE_SUCCESS)
+			{
+				// Clean up the session info so we don't get into a confused state
+				RemoveNamedSession(SessionName);
+			}
+			else
+			{
+				RegisterLocalPlayers(Session);
+			}
+		}
+	}
+	else
+	{
+		UE_LOG_ONLINE_SESSION(Warning, TEXT("Cannot create session '%s': session already exists."), *SessionName.ToString());
+	}
+
+	if (Result != ONLINE_IO_PENDING)
+	{
+		TriggerOnCreateSessionCompleteDelegates(SessionName, (Result == ONLINE_SUCCESS) ? true : false);
+	}
+
+	return Result == ONLINE_IO_PENDING || Result == ONLINE_SUCCESS;
+}
+
+uint32 FOnlineSessionFlex::UpdateMasterServer(FNamedOnlineSession* Session) 
+{
+
+
+
+
 }
 
 bool FOnlineSessionFlex::CreateSession(const FUniqueNetId& HostingPlayerId, FName SessionName, const FOnlineSessionSettings& NewSessionSettings)
 {
-	return false;
+	return CreateSession(0, SessionName, NewSessionSettings);
 }
 
 bool FOnlineSessionFlex::StartSession(FName SessionName)

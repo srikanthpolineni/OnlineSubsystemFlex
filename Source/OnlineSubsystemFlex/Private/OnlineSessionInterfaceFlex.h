@@ -67,6 +67,8 @@ protected:
 
 	void UnregisterVoice(const FUniqueNetId& PlayerId);
 
+	uint32 UpdateMasterServer(FNamedOnlineSession* Session);
+
 PACKAGE_SCOPE:
 	mutable FCriticalSection SessionLock;
 

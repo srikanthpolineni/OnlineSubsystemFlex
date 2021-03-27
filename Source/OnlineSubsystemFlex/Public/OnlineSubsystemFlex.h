@@ -43,6 +43,12 @@ protected:
 
 	mutable bool bVoiceInterfaceInitialized;
 
+	/** Online async task runnable */
+	class FOnlineAsyncTaskManagerFlex* OnlineAsyncTaskThreadRunnable;
+
+	/** Online async task thread */
+	class FRunnableThread* OnlineAsyncTaskThread;
+
 
 
 PACKAGE_SCOPE:

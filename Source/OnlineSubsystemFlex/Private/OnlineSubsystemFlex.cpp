@@ -59,17 +59,17 @@ bool FOnlineSubsystemFlex::Init()
 {
 	const bool bIsServer = IsRunningDedicatedServer();
 
+	OnlineAsyncTaskThreadRunnable = new FOnlineAsyncTaskManagerFlex(this);
+	check(OnlineAsyncTaskThreadRunnable);
+	OnlineAsyncTaskThread = FRunnableThread::Create(OnlineAsyncTaskThreadRunnable, *FString::Printf(TEXT("OnlineAsyncTaskThreadSteam %s"), *InstanceName.ToString()), 128 * 1024, TPri_Normal);
+	check(OnlineAsyncTaskThread);
+	UE_LOG_ONLINE(Verbose, TEXT("Created thread (ID:%d)."), OnlineAsyncTaskThread->GetThreadID());
+
+
 
 	SessionInterface = MakeShareable(new FOnlineSessionFlex(this));
 
-	// Initialize all Ports
-	if (FParse::Value(FCommandLine::Get(), TEXT("Port="), GameServerGamePort) == false)
-	{
-		//GConfig->GetInt(TEXT("URL"), TEXT("Port"), GameServerGamePort, GEngineIni);
-	}
-
-	//GameServerLocalPort = GameServerGamePort+1;
-	//GameServerQueryPort = 27015;
+	
 
 	return true;
 }
@@ -167,4 +167,10 @@ IOnlineTitleFilePtr FOnlineSubsystemFlex::GetTitleFileInterface() const
 IOnlineEntitlementsPtr FOnlineSubsystemFlex::GetEntitlementsInterface() const
 {
 	return nullptr;
+}
+
+void FOnlineSubsystemFlex::QueueAsyncTask(FOnlineAsyncTask* AsyncTask)
+{
+	check(OnlineAsyncTaskThreadRunnable);
+	OnlineAsyncTaskThreadRunnable->AddToInQueue(AsyncTask);
 }
