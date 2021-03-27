@@ -61,7 +61,7 @@ bool FOnlineSubsystemFlex::Init()
 
 	OnlineAsyncTaskThreadRunnable = new FOnlineAsyncTaskManagerFlex(this);
 	check(OnlineAsyncTaskThreadRunnable);
-	OnlineAsyncTaskThread = FRunnableThread::Create(OnlineAsyncTaskThreadRunnable, *FString::Printf(TEXT("OnlineAsyncTaskThreadSteam %s"), *InstanceName.ToString()), 128 * 1024, TPri_Normal);
+	OnlineAsyncTaskThread = FRunnableThread::Create(OnlineAsyncTaskThreadRunnable, *FString::Printf(TEXT("OnlineAsyncTaskThreadFlex %s"), *InstanceName.ToString()), 128 * 1024, TPri_Normal);
 	check(OnlineAsyncTaskThread);
 	UE_LOG_ONLINE(Verbose, TEXT("Created thread (ID:%d)."), OnlineAsyncTaskThread->GetThreadID());
 
