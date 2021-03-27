@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-#include "CoreMinimal.h"
-#include "Modules/ModuleManager.h"
 #include "OnlineSubsystemFlexModule.h"
+#include "Modules/ModuleManager.h"
 #include "OnlineSubsystemModule.h"
 #include "OnlineSubsystemNames.h"
 #include "OnlineSubsystem.h"

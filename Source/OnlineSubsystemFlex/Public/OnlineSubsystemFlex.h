@@ -4,6 +4,11 @@
 #include "OnlineDelegateMacros.h"
 #include "OnlineSubsystemImpl.h"
 
+#ifndef FLEX_SUBSYSTEM
+#define FLEX_SUBSYSTEM FName(TEXT("FLEX"))
+#endif
+
+
 class FOnlineSessionFlex;
 
 typedef TSharedPtr<class FOnlineSessionFlex, ESPMode::ThreadSafe> FOnlineSessionFlexPtr;

@@ -75,31 +75,31 @@ public:
 
 	const uint8* GetBytes() const override
 	{
-		throw std::logic_error("The method or operation is not implemented.");
+		throw "The method or operation is not implemented.";
 	}
 
 
 	int32 GetSize() const override
 	{
-		throw std::logic_error("The method or operation is not implemented.");
+		throw "The method or operation is not implemented.";
 	}
 
 
 	bool IsValid() const override
 	{
-		throw std::logic_error("The method or operation is not implemented.");
+		throw "The method or operation is not implemented.";
 	}
 
 
 	FString ToString() const override
 	{
-		throw std::logic_error("The method or operation is not implemented.");
+		throw "The method or operation is not implemented.";
 	}
 
 
 	FString ToDebugString() const override
 	{
-		throw std::logic_error("The method or operation is not implemented.");
+		throw "The method or operation is not implemented.";
 	}
 
 };
