@@ -4,9 +4,14 @@
 #include "DOM/JsonObject.h"
 #include "Serialization/JsonSerializer.h"
 
-FFlexMasterServer::FFlexMasterServer()
+
+FFlexMasterServerPtr FFlexMasterServer::Singleton = nullptr;
+FFlexMasterServerPtr FFlexMasterServer::Get()
 {
-	bIsInitialized = false;
+	if (Singleton == nullptr) {
+		Singleton = MakeShareable(new FFlexMasterServer); //TODO: TSharedPtr
+	}
+	return Singleton;
 }
 
 bool FFlexMasterServer::Init()
@@ -45,7 +50,14 @@ void FFlexMasterServer::OnClosed(int32 StatusCode, const FString& Reason, bool b
 
 void FFlexMasterServer::OnMessage(const FString& Msg)
 {
+	TSharedPtr<FJsonObject> JsonMsg;
+	auto JsonReader = TJsonReaderFactory<TCHAR>::Create(Msg);
+	if (!FJsonSerializer::Deserialize(JsonReader, JsonMsg))
+	{
+		//TODO:Log Error
+	}
 
+	Observer->OnMasterServerObserve(JsonMsg);
 }
 
 FFlexMasterServer::~FFlexMasterServer()
@@ -66,4 +78,14 @@ FFlexMasterServer::~FFlexMasterServer()
 bool FFlexMasterServer::IsInitialized()
 {
 	return bIsInitialized;
+}
+
+void FFlexMasterServer::setObserver(FOnlineAsyncTaskManagerFlex* InObserver)
+{
+	Observer = InObserver;
+}
+
+bool FFlexMasterServer::SendMessage(FString eventType, TSharedPtr<FJsonObject>& jsonObject)
+{
+	return true;
 }

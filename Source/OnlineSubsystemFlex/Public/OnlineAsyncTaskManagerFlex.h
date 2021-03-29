@@ -4,6 +4,9 @@
 #include "OnlineSubsystem.h"
 #include "OnlineAsyncTaskManager.h"
 
+class FJsonObject;
+class FFlexMasterServer;
+typedef TSharedPtr<class FFlexMasterServer, ESPMode::ThreadSafe> FFlexMasterServerPtr;
 class FOnlineAsyncTaskManagerFlex : public FOnlineAsyncTaskManager
 {
 
@@ -15,9 +18,7 @@ protected:
 
 
 public:
-	FOnlineAsyncTaskManagerFlex(class FOnlineSubsystemFlex* InOnlineSubsystem):
-		FlexSubsystem(InOnlineSubsystem)
-	{}
+	FOnlineAsyncTaskManagerFlex(FOnlineSubsystemFlex* InOnlineSubsystem);
 	~FOnlineAsyncTaskManagerFlex()
 	{
 	}
@@ -25,5 +26,11 @@ public:
 	// FOnlineAsyncTaskManager
 	virtual void OnlineTick() override;
 
+	using FJsonObjectPtr = TSharedPtr<FJsonObject>;
+	void OnMasterServerObserve(FJsonObjectPtr& Json);
+
+
+
 };
+
 

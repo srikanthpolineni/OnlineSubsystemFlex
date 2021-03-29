@@ -6,55 +6,47 @@
 #include "Containers/UnrealString.h"
 #include "Containers/Map.h"
 #include "DOM/JsonObject.h"
-#include "Misc/ScopeLock.h"
+#include "OnlineAsyncTaskManagerFlex.h"
 
 
 class IWebSocket;
-
+class FFlexMasterServer;
 typedef TSharedPtr<class FFlexMasterServer, ESPMode::ThreadSafe> FFlexMasterServerPtr;
 class FFlexMasterServer
 {
 
 public:
-	FFlexMasterServer(FFlexMasterServer const&) = delete;
-	FFlexMasterServer& operator=(FFlexMasterServer const&) = delete;
-
-	static FFlexMasterServerPtr Instance()
-	{
-		FScopeLock ScopeLock(&FlexMasterServerLock);
-		static FFlexMasterServerPtr  ins{ MakeShareable(new FFlexMasterServer) };
-		return ins;
-	}
-
+	FFlexMasterServer(){}
+	static FFlexMasterServerPtr Get();
 
 private:
-	FFlexMasterServer();
 	bool Init();
 	void OnConnected();
 	void OnConnectionError(const FString& Error);
 	void OnClosed(int32 StatusCode, const FString& Reason, bool bWasClean);
 	void OnMessage(const FString& Msg);
 
-protected:
-	static FCriticalSection FlexMasterServerLock;
-	
 
 
 public:
 	~FFlexMasterServer();
 	bool IsInitialized();
+	void setObserver(FOnlineAsyncTaskManagerFlex* InObserver);
 
-	bool Notify(FString str);
+	bool SendMessage(FString eventType, TSharedPtr<FJsonObject>& jsonObject);
 
 
 
 private:
-	bool bIsInitialized;
+	bool bIsInitialized = false;
 	TSharedPtr<IWebSocket> WS;
 	FDelegateHandle OnConnectedHandle;
 	FDelegateHandle OnConnectionErrorHandle;
 	FDelegateHandle OnClosedHandle;
 	FDelegateHandle OnMessageHandle;
+	FOnlineAsyncTaskManagerFlex* Observer;
+
+	static FFlexMasterServerPtr Singleton;
 
 
 };

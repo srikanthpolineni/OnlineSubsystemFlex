@@ -6,8 +6,6 @@
 
 
 
-typedef void (*FlexMasterAPICall_t)();
-
 class FOnlineSessionAsyncTaskFlexCreateServer : public FOnlineAsyncTaskBasic<class FOnlineSubsystemFlex>
 {
 
@@ -16,15 +14,13 @@ private:
 	bool bInit;
 	/** Name of session being created */
 	FName SessionName;
-	FlexMasterAPICall_t CallbackHandle;
 
 public:
 
-	FOnlineSessionAsyncTaskFlexCreateServer(class FOnlineSubsystemFlex* InSubsystem, FName InSessionName, FlexMasterAPICall_t InCallbackHandle) :
+	FOnlineSessionAsyncTaskFlexCreateServer(class FOnlineSubsystemFlex* InSubsystem, FName InSessionName) :
 		FOnlineAsyncTaskBasic(InSubsystem),
 		bInit (false),
-		SessionName (InSessionName),
-		CallbackHandle(InCallbackHandle)
+		SessionName (InSessionName)
 	{
 	}
 
