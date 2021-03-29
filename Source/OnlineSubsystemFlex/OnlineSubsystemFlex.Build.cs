@@ -33,7 +33,8 @@ public class OnlineSubsystemFlex : ModuleRules
                 "PacketHandler",
                 "Projects",
                 "Sockets",
-                "Networking"
+                "WebSockets",
+                "Networking",
             }
             );
 
