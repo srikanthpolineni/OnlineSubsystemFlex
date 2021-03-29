@@ -101,7 +101,27 @@ FText FOnlineSubsystemFlex::GetOnlineServiceName() const
 
 bool FOnlineSubsystemFlex::Tick(float DeltaTime)
 {
-	return false;
+	if (!FOnlineSubsystemImpl::Tick(DeltaTime))
+	{
+		return false;
+	}
+
+	if (OnlineAsyncTaskThreadRunnable)
+	{
+		OnlineAsyncTaskThreadRunnable->GameTick();
+	}
+
+	if (SessionInterface.IsValid())
+	{
+		SessionInterface->Tick(DeltaTime);
+	}
+
+	if (VoiceInterface.IsValid() && bVoiceInterfaceInitialized)
+	{
+		VoiceInterface->Tick(DeltaTime);
+	}
+
+	return true;
 }
 
 IOnlineSessionPtr FOnlineSubsystemFlex::GetSessionInterface() const
