@@ -2,6 +2,7 @@
 #include "SocketSubsystem.h"
 #include "OnlineSubsystemFlex.h"
 #include "OnlineSubsystemUtils.h"
+#include "OnlineAsyncTaskFlexServer.h"
 
 
 #pragma region FOnlineSessionInfoFlex
@@ -251,8 +252,12 @@ bool FOnlineSessionFlex::CreateSession(int32 HostingPlayerNum, FName SessionName
 
 uint32 FOnlineSessionFlex::UpdateMasterServer(FNamedOnlineSession* Session) 
 {
+	uint32 Result = ONLINE_FAIL;
 
-	return ONLINE_IO_PENDING;
+	FOnlineSessionAsyncTaskFlexCreateSession* NewTask = new FOnlineSessionAsyncTaskFlexCreateSession(FlexSubsystem, Session->SessionName);
+	FlexSubsystem->QueueAsyncTask(NewTask);
+	Result = ONLINE_IO_PENDING;
+	return Result;
 
 
 }

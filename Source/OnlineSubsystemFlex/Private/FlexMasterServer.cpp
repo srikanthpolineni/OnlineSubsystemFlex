@@ -1,4 +1,6 @@
 #include "FlexMasterServer.h"
+#include "Utils.h"
+
 #include "WebSocketsModule.h"
 #include "IWebSocket.h"
 #include "DOM/JsonObject.h"
@@ -9,7 +11,8 @@ FFlexMasterServerPtr FFlexMasterServer::Singleton = nullptr;
 FFlexMasterServerPtr FFlexMasterServer::Get()
 {
 	if (Singleton == nullptr) {
-		Singleton = MakeShareable(new FFlexMasterServer); //TODO: TSharedPtr
+		//TODO: Add scoped lock
+		Singleton = MakeShareable(new FFlexMasterServer);
 	}
 	return Singleton;
 }
@@ -22,10 +25,22 @@ bool FFlexMasterServer::Init()
 	GConfig->GetString(TEXT("OnlineSubsystemFlex"), TEXT("MasterServerWS"), Url, GEngineIni);
 
 	WS = FWebSocketsModule::Get().CreateWebSocket(Url, TEXT("ws"));
-	OnConnectedHandle = WS->OnConnected().AddLambda([this]() { OnConnected(); });
-	OnConnectionErrorHandle = WS->OnConnectionError().AddLambda([this](const FString& Error) { OnConnectionError(Error); });
-	OnClosedHandle = WS->OnClosed().AddLambda([this](int32 StatusCode, const FString& Reason, bool bWasClean) { OnClosed(StatusCode, Reason, bWasClean); });
-	OnMessageHandle = WS->OnMessage().AddLambda([this](const FString& Msg) { OnMessage(Msg); });
+	OnConnectedHandle = WS->OnConnected().AddLambda([this]()
+		{
+			OnConnected();
+		});
+	OnConnectionErrorHandle = WS->OnConnectionError().AddLambda([this](const FString& Error)
+		{
+			OnConnectionError(Error);
+		});
+	OnClosedHandle = WS->OnClosed().AddLambda([this](int32 StatusCode, const FString& Reason, bool bWasClean)
+		{
+			OnClosed(StatusCode, Reason, bWasClean);
+		});
+	OnMessageHandle = WS->OnMessage().AddLambda([this](const FString& Msg)
+		{
+			OnMessage(Msg);
+		});
 
 	WS->Connect();
 
@@ -35,26 +50,31 @@ bool FFlexMasterServer::Init()
 
 void FFlexMasterServer::OnConnected()
 {
+	UE_LOG_ONLINE(Error, TEXT("FFlexMasterServer::OnConnected"));
 	bIsInitialized = true;
 }
 
 void FFlexMasterServer::OnConnectionError(const FString& Error)
 {
+	UE_LOG_ONLINE(Error, TEXT("FFlexMasterServer::OnConnectionError"));
 	bIsInitialized = false;
 }
 
 void FFlexMasterServer::OnClosed(int32 StatusCode, const FString& Reason, bool bWasClean)
 {
+	UE_LOG_ONLINE(Error, TEXT("FFlexMasterServer::OnClosed"));
 	bIsInitialized = false;
 }
 
 void FFlexMasterServer::OnMessage(const FString& Msg)
 {
+	UE_LOG_ONLINE(Log, TEXT("FFlexMasterServer::OnMessage"));
+	UE_LOG_ONLINE(Log, TEXT("Message Received=%s"), *Msg);
 	TSharedPtr<FJsonObject> JsonMsg;
 	auto JsonReader = TJsonReaderFactory<TCHAR>::Create(Msg);
 	if (!FJsonSerializer::Deserialize(JsonReader, JsonMsg))
 	{
-		//TODO:Log Error
+		UE_LOG_ONLINE(Error, TEXT("FFlexMasterServer::OnMessage Unable to Deserialize Msg"));
 	}
 
 	Observer->OnMasterServerObserve(JsonMsg);

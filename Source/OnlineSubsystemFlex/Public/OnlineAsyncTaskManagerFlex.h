@@ -16,6 +16,8 @@ protected:
 	/** Cached reference to the main online subsystem */
 	class FOnlineSubsystemFlex* FlexSubsystem;
 
+private:
+	FFlexMasterServerPtr masteServer;
 
 public:
 	FOnlineAsyncTaskManagerFlex(FOnlineSubsystemFlex* InOnlineSubsystem);

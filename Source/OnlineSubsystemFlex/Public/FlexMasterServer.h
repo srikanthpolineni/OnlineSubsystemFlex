@@ -18,9 +18,6 @@ class FFlexMasterServer
 public:
 	FFlexMasterServer(){}
 	static FFlexMasterServerPtr Get();
-
-private:
-	bool Init();
 	void OnConnected();
 	void OnConnectionError(const FString& Error);
 	void OnClosed(int32 StatusCode, const FString& Reason, bool bWasClean);
@@ -30,6 +27,7 @@ private:
 
 public:
 	~FFlexMasterServer();
+	bool Init();
 	bool IsInitialized();
 	void setObserver(FOnlineAsyncTaskManagerFlex* InObserver);
 

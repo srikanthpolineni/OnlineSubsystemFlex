@@ -1,4 +1,5 @@
 #include "OnlineSubsystemFlex.h"
+#include "FlexMasterServer.h"
 
 IOnlineEventsPtr FOnlineSubsystemFlex::GetEventsInterface() const
 {
@@ -58,6 +59,8 @@ bool FOnlineSubsystemFlex::IsLocalPlayer(const FUniqueNetId& UniqueId) const
 bool FOnlineSubsystemFlex::Init()
 {
 	const bool bIsServer = IsRunningDedicatedServer();
+	if (!bIsServer)
+		return false;
 
 	OnlineAsyncTaskThreadRunnable = new FOnlineAsyncTaskManagerFlex(this);
 	check(OnlineAsyncTaskThreadRunnable);
@@ -69,7 +72,7 @@ bool FOnlineSubsystemFlex::Init()
 
 	SessionInterface = MakeShareable(new FOnlineSessionFlex(this));
 
-	
+
 
 	return true;
 }

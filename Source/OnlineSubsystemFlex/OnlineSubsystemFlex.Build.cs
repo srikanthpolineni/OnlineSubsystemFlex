@@ -34,7 +34,7 @@ public class OnlineSubsystemFlex : ModuleRules
                 "Projects",
                 "Sockets",
                 "WebSockets",
-                "Networking",
+                "Networking"
             }
             );
 

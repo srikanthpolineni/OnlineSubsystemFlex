@@ -6,7 +6,7 @@
 
 
 
-class FOnlineSessionAsyncTaskFlexCreateServer : public FOnlineAsyncTaskBasic<class FOnlineSubsystemFlex>
+class FOnlineSessionAsyncTaskFlexCreateSession : public FOnlineAsyncTaskBasic<class FOnlineSubsystemFlex>
 {
 
 private:
@@ -17,14 +17,14 @@ private:
 
 public:
 
-	FOnlineSessionAsyncTaskFlexCreateServer(class FOnlineSubsystemFlex* InSubsystem, FName InSessionName) :
+	FOnlineSessionAsyncTaskFlexCreateSession(class FOnlineSubsystemFlex* InSubsystem, FName InSessionName) :
 		FOnlineAsyncTaskBasic(InSubsystem),
 		bInit (false),
 		SessionName (InSessionName)
 	{
 	}
 
-	virtual ~FOnlineSessionAsyncTaskFlexCreateServer()
+	virtual ~FOnlineSessionAsyncTaskFlexCreateSession()
 	{
 	}
 

@@ -60,6 +60,10 @@ FOnlineSubsystemFlexPtr FOnlineFactoryFlex::FlexSingleton = nullptr;
 
 void FOnlineSubsystemFlexModule::StartupModule()
 {
+	if (FModuleManager::Get().ModuleExists(TEXT("WebSockets")))
+	{
+		FModuleManager::Get().LoadModule(TEXT("WebSockets"));
+	}
 
 	FlexFactory = new FOnlineFactoryFlex();
 	FOnlineSubsystemModule& OSS = FModuleManager::GetModuleChecked<FOnlineSubsystemModule>("OnlineSubsystem");
