@@ -52,3 +52,27 @@ public:
 
 };
 
+class FOnlineSessionAsyncTaskFlexCreateSessionFinish : public FOnlineAsyncTaskBasic<class FOnlineSubsystemFlex>
+{
+
+public:
+	FOnlineSessionAsyncTaskFlexCreateSessionFinish(class FOnlineSubsystemFlex* InSubsystem):
+		FOnlineAsyncTaskBasic(InSubsystem)
+	{
+	}
+
+	virtual ~FOnlineSessionAsyncTaskFlexCreateSessionFinish()
+	{
+	}
+
+	virtual FString ToString() const override;
+
+	virtual void Tick() override;
+
+	virtual void Finalize() override;
+
+	virtual void TriggerDelegates() override;
+
+};
+
+

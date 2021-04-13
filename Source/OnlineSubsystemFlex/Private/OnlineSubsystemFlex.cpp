@@ -68,6 +68,13 @@ bool FOnlineSubsystemFlex::Init()
 	check(OnlineAsyncTaskThread);
 	UE_LOG_ONLINE(Verbose, TEXT("Created thread (ID:%d)."), OnlineAsyncTaskThread->GetThreadID());
 
+	if (!bIsServer) {
+		OnlineAsyncTaskThreadRunnable->InitClient();
+	}
+	else {
+		OnlineAsyncTaskThreadRunnable->InitServer();
+	}
+
 
 
 	SessionInterface = MakeShareable(new FOnlineSessionFlex(this));

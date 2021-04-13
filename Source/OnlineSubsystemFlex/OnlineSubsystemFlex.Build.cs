@@ -6,6 +6,7 @@ public class OnlineSubsystemFlex : ModuleRules
 {
     public OnlineSubsystemFlex(ReadOnlyTargetRules Target) : base(Target)
     {
+        OptimizeCode = CodeOptimization.Never;
         PrivateDefinitions.Add("ONLINESUBSYSTEMFLEX_PACKAGE=1");
 
         PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;

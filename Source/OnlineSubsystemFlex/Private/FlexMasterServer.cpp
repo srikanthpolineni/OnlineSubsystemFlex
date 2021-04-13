@@ -1,6 +1,4 @@
 #include "FlexMasterServer.h"
-#include "Utils.h"
-
 #include "WebSocketsModule.h"
 #include "IWebSocket.h"
 #include "DOM/JsonObject.h"
@@ -50,19 +48,19 @@ bool FFlexMasterServer::Init()
 
 void FFlexMasterServer::OnConnected()
 {
-	UE_LOG_ONLINE(Error, TEXT("FFlexMasterServer::OnConnected"));
+	UE_LOG_ONLINE(Log, TEXT("FFlexMasterServer::OnConnected"));
 	bIsInitialized = true;
 }
 
 void FFlexMasterServer::OnConnectionError(const FString& Error)
 {
-	UE_LOG_ONLINE(Error, TEXT("FFlexMasterServer::OnConnectionError"));
+	UE_LOG_ONLINE(Log, TEXT("FFlexMasterServer::OnConnectionError"));
 	bIsInitialized = false;
 }
 
 void FFlexMasterServer::OnClosed(int32 StatusCode, const FString& Reason, bool bWasClean)
 {
-	UE_LOG_ONLINE(Error, TEXT("FFlexMasterServer::OnClosed"));
+	UE_LOG_ONLINE(Log, TEXT("FFlexMasterServer::OnClosed"));
 	bIsInitialized = false;
 }
 
@@ -105,7 +103,11 @@ void FFlexMasterServer::setObserver(FOnlineAsyncTaskManagerFlex* InObserver)
 	Observer = InObserver;
 }
 
-bool FFlexMasterServer::SendMessage(FString eventType, TSharedPtr<FJsonObject>& jsonObject)
+bool FFlexMasterServer::SendMessage(FString eventType, const TSharedPtr<FJsonObject>& messageObject)
 {
+	auto RequestJson = MakeShared<FJsonObject>();
+	RequestJson->SetObjectField(TEXT("message"), messageObject);
+	RequestJson->SetStringField(TEXT("action"), eventType);
+	WS->Send(ToString(RequestJson, false));
 	return true;
 }
