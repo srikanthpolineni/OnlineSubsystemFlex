@@ -9,7 +9,7 @@ typedef TSharedPtr<class FFlexMasterServer, ESPMode::ThreadSafe> FFlexMasterServ
 
 FString FOnlineSessionAsyncTaskFlexCreateSession::ToString() const
 {
-	return FString();
+	return FString(TEXT("FOnlineSessionAsyncTaskFlexCreateSession"));
 }
 
 void FOnlineSessionAsyncTaskFlexCreateSession::Tick()
@@ -49,6 +49,7 @@ void FOnlineSessionAsyncTaskFlexCreateSession::Tick()
 
 void FOnlineSessionAsyncTaskFlexCreateSession::Finalize()
 {
+	UE_LOG_ONLINE(Log, TEXT("Flex Create Session Finished with status: %s."), bWasSuccessful ? TEXT("SUCCESSFUL") : TEXT("FAILED"));
 }
 
 void FOnlineSessionAsyncTaskFlexCreateSession::TriggerDelegates()
@@ -58,7 +59,7 @@ void FOnlineSessionAsyncTaskFlexCreateSession::TriggerDelegates()
 
 FString FOnlineSessionAsyncTaskFlexCreateSessionFinish::ToString() const
 {
-	return FString();
+	return FString(TEXT("FOnlineSessionAsyncTaskFlexCreateSessionFinish"));
 }
 
 void FOnlineSessionAsyncTaskFlexCreateSessionFinish::Tick()
@@ -78,4 +79,27 @@ void FOnlineSessionAsyncTaskFlexCreateSessionFinish::Finalize()
 void FOnlineSessionAsyncTaskFlexCreateSessionFinish::TriggerDelegates()
 {
 
+}
+
+void FOnlineSessionAsyncTaskFlexFindServer::Tick()
+{
+	
+}
+
+FString FOnlineSessionAsyncTaskFlexFindServer::ToString() const
+{
+	return FString(TEXT("FOnlineSessionAsyncTaskFlexFindServer"));
+}
+
+void FOnlineSessionAsyncTaskFlexFindServer::Finalize()
+{
+	
+}
+
+void FOnlineSessionAsyncTaskFlexFindServer::TriggerDelegates()
+{
+	if (FindServersCompleteDelegates.IsBound())
+	{
+		FindServersCompleteDelegates.Broadcast(bWasSuccessful);
+	}
 }

@@ -59,8 +59,7 @@ bool FOnlineSubsystemFlex::IsLocalPlayer(const FUniqueNetId& UniqueId) const
 bool FOnlineSubsystemFlex::Init()
 {
 	const bool bIsServer = IsRunningDedicatedServer();
-	if (!bIsServer)
-		return false;
+	const bool bIsGame = IsRunningGame();
 
 	OnlineAsyncTaskThreadRunnable = new FOnlineAsyncTaskManagerFlex(this);
 	check(OnlineAsyncTaskThreadRunnable);
@@ -68,10 +67,10 @@ bool FOnlineSubsystemFlex::Init()
 	check(OnlineAsyncTaskThread);
 	UE_LOG_ONLINE(Verbose, TEXT("Created thread (ID:%d)."), OnlineAsyncTaskThread->GetThreadID());
 
-	if (!bIsServer) {
+	if (bIsGame) {
 		OnlineAsyncTaskThreadRunnable->InitClient();
 	}
-	else {
+	if (bIsServer) {
 		OnlineAsyncTaskThreadRunnable->InitServer();
 	}
 
@@ -80,8 +79,7 @@ bool FOnlineSubsystemFlex::Init()
 	SessionInterface = MakeShareable(new FOnlineSessionFlex(this));
 
 
-
-	return true;
+	return bIsServer || bIsGame;
 }
 
 bool FOnlineSubsystemFlex::Shutdown()

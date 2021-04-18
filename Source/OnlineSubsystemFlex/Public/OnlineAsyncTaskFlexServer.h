@@ -3,7 +3,16 @@
 #include "CoreMinimal.h"
 #include "OnlineAsyncTaskManager.h"
 #include "OnlineSubsystemFlex.h"
+#include "OnlineSessionSettings.h"
 
+
+
+class IHttpClientObserver
+{
+	virtual void OnSuccessResponse(TSharedPtr<FJsonObject> JsonObject);
+
+	virtual void OnFailedResponse(int32 StatusCode, FString Message);
+};
 
 
 class FOnlineSessionAsyncTaskFlexCreateSession : public FOnlineAsyncTaskBasic<class FOnlineSubsystemFlex>
@@ -70,6 +79,43 @@ public:
 	virtual void Tick() override;
 
 	virtual void Finalize() override;
+
+	virtual void TriggerDelegates() override;
+
+};
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnAsyncFindServersComplete, bool);
+typedef FOnAsyncFindServersComplete::FDelegate FOnAsyncFindServersCompleteDelegate;
+
+class FOnlineSessionAsyncTaskFlexFindServer : public FOnlineAsyncTaskBasic<class FOnlineSubsystemFlex>
+{
+
+private:
+	bool bInit;
+	TSharedPtr<class FOnlineSessionSearch> SearchSettings;
+	FOnAsyncFindServersComplete FindServersCompleteDelegates;
+
+public:
+
+	FOnlineSessionAsyncTaskFlexFindServer(class FOnlineSubsystemFlex* InSubsystem, const TSharedPtr<class FOnlineSessionSearch>& InSearchSettings, FOnAsyncFindServersComplete& InDelegates)
+		:FOnlineAsyncTaskBasic(InSubsystem),
+		bInit(false),
+		SearchSettings(InSearchSettings),
+		FindServersCompleteDelegates(InDelegates)
+	{}
+
+	virtual ~FOnlineSessionAsyncTaskFlexFindServer()
+	{
+	}
+
+	virtual void Tick() override;
+
+
+	virtual FString ToString() const override;
+
+
+	virtual void Finalize() override;
+
 
 	virtual void TriggerDelegates() override;
 

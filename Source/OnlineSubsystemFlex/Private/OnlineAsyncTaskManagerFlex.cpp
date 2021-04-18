@@ -11,6 +11,7 @@ FOnlineAsyncTaskManagerFlex::FOnlineAsyncTaskManagerFlex(FOnlineSubsystemFlex* I
 
 bool FOnlineAsyncTaskManagerFlex::InitServer()
 {
+	// Initializes the WS connection the Master server
 	masteServer = FFlexMasterServer::Get();
 	masteServer->setObserver(this);
 	masteServer->Init();
@@ -19,6 +20,7 @@ bool FOnlineAsyncTaskManagerFlex::InitServer()
 
 bool FOnlineAsyncTaskManagerFlex::InitClient()
 {
+	//TODO: WS Logic for Chat and other client related activities
 	return true;
 }
 
