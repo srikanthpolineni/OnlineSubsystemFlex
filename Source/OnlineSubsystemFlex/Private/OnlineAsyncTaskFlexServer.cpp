@@ -4,6 +4,9 @@
 #include "FlexMasterServer.h"
 #include "OnlineSessionSettings.h"
 #include "DOM/JsonObject.h"
+#include "HttpModule.h"
+#include "PlatformHttp.h"
+#include "Interfaces/IHttpResponse.h"
 
 typedef TSharedPtr<class FFlexMasterServer, ESPMode::ThreadSafe> FFlexMasterServerPtr;
 
@@ -81,9 +84,27 @@ void FOnlineSessionAsyncTaskFlexCreateSessionFinish::TriggerDelegates()
 
 }
 
+FOnlineSessionAsyncTaskFlexFindServer::FOnlineSessionAsyncTaskFlexFindServer(class FOnlineSubsystemFlex* InSubsystem, const TSharedPtr<class FOnlineSessionSearch>& InSearchSettings, FOnAsyncFindServersComplete& InDelegates)
+	:FOnlineAsyncTaskBasic(InSubsystem)
+{
+	bInit = false;
+	SearchSettings = InSearchSettings;
+	FindServersCompleteDelegates = InDelegates;
+	HttpClient = FHttpModule::Get().CreateRequest();
+	HttpClient->SetVerb(TEXT("GET"));
+	HttpClient->SetURL(TEXT("http://localhost:8080/api/clients"));
+	HttpClient->OnProcessRequestComplete().BindLambda(
+		[=](FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
+		{
+			//TODO:
+		});
+	HttpClient->ProcessRequest();
+	bInit = true;
+}
+
 void FOnlineSessionAsyncTaskFlexFindServer::Tick()
 {
-	
+
 }
 
 FString FOnlineSessionAsyncTaskFlexFindServer::ToString() const
@@ -93,7 +114,7 @@ FString FOnlineSessionAsyncTaskFlexFindServer::ToString() const
 
 void FOnlineSessionAsyncTaskFlexFindServer::Finalize()
 {
-	
+
 }
 
 void FOnlineSessionAsyncTaskFlexFindServer::TriggerDelegates()

@@ -30,6 +30,7 @@ public class OnlineSubsystemFlex : ModuleRules
                 "Voice",
                 "AudioMixer",
                 "OnlineSubsystem",
+                "HTTP",
                 "Json",
                 "PacketHandler",
                 "Projects",

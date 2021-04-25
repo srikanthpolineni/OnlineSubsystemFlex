@@ -94,15 +94,12 @@ private:
 	bool bInit;
 	TSharedPtr<class FOnlineSessionSearch> SearchSettings;
 	FOnAsyncFindServersComplete FindServersCompleteDelegates;
+	TSharedRef<class IHttpRequest> HttpClient;
 
 public:
 
-	FOnlineSessionAsyncTaskFlexFindServer(class FOnlineSubsystemFlex* InSubsystem, const TSharedPtr<class FOnlineSessionSearch>& InSearchSettings, FOnAsyncFindServersComplete& InDelegates)
-		:FOnlineAsyncTaskBasic(InSubsystem),
-		bInit(false),
-		SearchSettings(InSearchSettings),
-		FindServersCompleteDelegates(InDelegates)
-	{}
+	FOnlineSessionAsyncTaskFlexFindServer(class FOnlineSubsystemFlex* InSubsystem, const TSharedPtr<class FOnlineSessionSearch>& InSearchSettings, FOnAsyncFindServersComplete& InDelegates);
+
 
 	virtual ~FOnlineSessionAsyncTaskFlexFindServer()
 	{
