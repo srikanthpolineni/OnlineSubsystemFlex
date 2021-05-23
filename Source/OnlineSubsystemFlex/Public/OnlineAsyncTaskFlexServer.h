@@ -94,7 +94,7 @@ private:
 	bool bInit;
 	TSharedPtr<class FOnlineSessionSearch> SearchSettings;
 	FOnAsyncFindServersComplete FindServersCompleteDelegates;
-	TSharedRef<class IHttpRequest> HttpClient;
+	TSharedPtr<class IHttpRequest, ESPMode::ThreadSafe> HttpClient;
 
 public:
 
