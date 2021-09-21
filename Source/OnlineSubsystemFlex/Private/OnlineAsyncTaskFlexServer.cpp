@@ -38,6 +38,7 @@ void FOnlineSessionAsyncTaskFlexCreateSession::Tick()
 	{
 		bIsComplete = true;
 		bWasSuccessful = true;
+		SessionInt->OnCreateSessionComplete(SessionName, FOnlineError(bWasSuccessful));
 	}
 	else
 	{
@@ -45,6 +46,7 @@ void FOnlineSessionAsyncTaskFlexCreateSession::Tick()
 		{
 			bIsComplete = true;
 			bWasSuccessful = false;
+			SessionInt->OnCreateSessionComplete(SessionName, FOnlineError(bWasSuccessful));
 		}
 	}
 
@@ -123,4 +125,25 @@ void FOnlineSessionAsyncTaskFlexFindServer::TriggerDelegates()
 	{
 		FindServersCompleteDelegates.Broadcast(bWasSuccessful);
 	}
+}
+
+FString FOnlineSessionAsyncTaskFlexStartSession::ToString() const
+{
+	return FString(TEXT("FOnlineSessionAsyncTaskFlexStartSession"));
+}
+
+void FOnlineSessionAsyncTaskFlexStartSession::Tick()
+{
+	bIsComplete = true;
+	bWasSuccessful = true;
+}
+
+void FOnlineSessionAsyncTaskFlexStartSession::Finalize()
+{
+	UE_LOG_ONLINE(Log, TEXT("Flex Start Session Finished with status: %s."), bWasSuccessful ? TEXT("SUCCESSFUL") : TEXT("FAILED"));
+}
+
+void FOnlineSessionAsyncTaskFlexStartSession::TriggerDelegates()
+{
+
 }

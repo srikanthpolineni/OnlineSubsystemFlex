@@ -219,7 +219,7 @@ bool FOnlineSessionFlex::CreateSession(int32 HostingPlayerNum, FName SessionName
 		NewSessionInfo->Init(*FlexSubsystem);
 		Session->SessionInfo = MakeShareable(NewSessionInfo);
 
-		Result = UpdateMasterServer(Session);
+		Result = CreateSessionOnMasterServer(Session);
 
 		if (Result != ONLINE_IO_PENDING)
 		{
@@ -250,16 +250,40 @@ bool FOnlineSessionFlex::CreateSession(int32 HostingPlayerNum, FName SessionName
 	return Result == ONLINE_IO_PENDING || Result == ONLINE_SUCCESS;
 }
 
-uint32 FOnlineSessionFlex::UpdateMasterServer(FNamedOnlineSession* Session) 
+uint32 FOnlineSessionFlex::CreateSessionOnMasterServer(FNamedOnlineSession* Session) 
 {
 	uint32 Result = ONLINE_FAIL;
 
-	FOnlineSessionAsyncTaskFlexCreateSession* NewTask = new FOnlineSessionAsyncTaskFlexCreateSession(FlexSubsystem, Session->SessionName);
-	FlexSubsystem->QueueAsyncTask(NewTask);
+	FOnlineSessionAsyncTaskFlexCreateSession* newTask = new FOnlineSessionAsyncTaskFlexCreateSession(FlexSubsystem, Session->SessionName);
+	FlexSubsystem->QueueAsyncTask(newTask);
 	Result = ONLINE_IO_PENDING;
 	return Result;
+}
 
+void FOnlineSessionFlex::OnCreateSessionComplete(FName SessionName, const FOnlineError& Error)
+{
 
+	UE_LOG_ONLINE_SESSION(Warning, TEXT("CreateSession %s: %s"), *SessionName.ToString(), *Error.ToLogString());
+	bool bWasSuccessful = Error.WasSuccessful();
+	FNamedOnlineSession* NamedSession = GetNamedSession(SessionName);
+	if (NamedSession)
+	{
+		if (Error.WasSuccessful())
+		{
+			NamedSession->SessionState = EOnlineSessionState::Pending;
+		}
+		else
+		{
+			RemoveNamedSession(SessionName);
+		}
+	}
+	else
+	{
+		UE_LOG_ONLINE_SESSION(Warning, TEXT("Unable to find session during creation = %s"), *SessionName.ToString());
+		bWasSuccessful = false;
+	}
+
+	TriggerOnCreateSessionCompleteDelegates(SessionName, bWasSuccessful);
 }
 
 bool FOnlineSessionFlex::CreateSession(const FUniqueNetId& HostingPlayerId, FName SessionName, const FOnlineSessionSettings& NewSessionSettings)
@@ -269,7 +293,16 @@ bool FOnlineSessionFlex::CreateSession(const FUniqueNetId& HostingPlayerId, FNam
 
 bool FOnlineSessionFlex::StartSession(FName SessionName)
 {
-	return false;
+	uint32 Result = ONLINE_IO_PENDING;
+
+	FNamedOnlineSession* Session = GetNamedSession(SessionName);
+
+	check(Session);
+
+	FOnlineSessionAsyncTaskFlexStartSession* newTask = new FOnlineSessionAsyncTaskFlexStartSession(FlexSubsystem, Session->SessionName);
+	FlexSubsystem->QueueAsyncTask(newTask);
+
+	return Result == ONLINE_IO_PENDING || Result == ONLINE_SUCCESS;
 }
 
 bool FOnlineSessionFlex::UpdateSession(FName SessionName, FOnlineSessionSettings& UpdatedSessionSettings, bool bShouldRefreshOnlineData)

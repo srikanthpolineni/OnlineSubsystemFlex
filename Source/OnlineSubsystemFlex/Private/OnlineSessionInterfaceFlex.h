@@ -67,7 +67,8 @@ protected:
 
 	void UnregisterVoice(const FUniqueNetId& PlayerId);
 
-	uint32 UpdateMasterServer(FNamedOnlineSession* Session);
+	uint32 CreateSessionOnMasterServer(FNamedOnlineSession* Session);
+
 
 PACKAGE_SCOPE:
 	mutable FCriticalSection SessionLock;
@@ -170,6 +171,8 @@ PACKAGE_SCOPE:
 	void RegisterLocalPlayers(class FNamedOnlineSession* Session);
 
 	FString GetCustomDedicatedServerName() const;
+
+	void OnCreateSessionComplete(FName SessionName, const FOnlineError& Error);
 
 public:
 	
